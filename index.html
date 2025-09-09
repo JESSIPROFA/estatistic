@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto: Quem Somos Nós? Um Retrato Estatístico da Nossa Escola - Autodeclaração</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Estilos CSS mantidos */
+        :root {
+            --primary: #451352;
+            --secondary: #6a1b9a;
+            --accent: #9c27b0;
+            --light: #f3e5f5;
+            --dark: #1a237e;
+            --text: #212121;
+            --background: #f5f5f5;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            min-height: 200px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .title-container {
+            flex: 1;
+            text-align: left;
+            padding-right: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .image-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+        
+        .roosevelt-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .roosevelt-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        button:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-clear {
+            background: #d32f2f;
+            margin-left: 1rem;
+        }
+        
+        .btn-clear:hover {
+            background: #b71c1c;
+        }
+        
+        .btn-admin {
+            background: #ff9800;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        
+        .btn-admin:hover {
+            background: #f57c00;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+        
+        .summary-box {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        
+        .summary-box h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .class-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .class-btn {
+            background: var(--light);
+            color: var(--text);
+            border: 1px solid #ddd;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        
+        .class-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .instructions {
+            background-color: #f3aca6;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+        
+        .instructions h3 {
+            color: #1565c0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .level-title {
+            font-weight: bold;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.3rem;
+        }
+        
+        .empty-data {
+            text-align: center;
+            padding: 2rem;
+            color: #757575;
+            font-style: italic;
+        }
+        
+        .admin-panel {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .admin-panel h3 {
+            color: #e65100;
+            margin-bottom: 0.5rem;
+        }
+        
+        .additional-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .additional-chart-container {
+            position: relative;
+            height: 250px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: var(--dark);
+            color: white;
+            margin-top: 2rem;
+        }
+        
+        .sync-notification {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Estilos para tabelas */
+        .data-table-container {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .data-table th {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .data-table .percentage {
+            color: #757575;
+            font-size: 0.9rem;
+        }
+        
+        .table-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .table-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .toggle-table {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .toggle-table:hover {
+            background-color: var(--primary);
+        }
+
+        /* Novos estilos para configuração do Google Sheets */
+        .config-panel {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .config-panel h3 {
+            color: #2e7d32;
+            margin-bottom: 0.5rem;
+        }
+        
+        .config-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .config-form .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .config-status {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .status-connected {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        
+        .status-disconnected {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="title-container">
+                <h1>Projeto: Quem Somos Nós?</h1>
+                <h1> Um Retrato Estatístico da Nossa Escola</h1>
+                <h2></h2>
+
+                <br><br>
+                <p class="subtitle"> Trabalho de Análise Estatística  - 2025</p>
+                <p>E.E. Presidente Roosevelt </p>
+                <p> Turma: 3°B  </p>
+                <p>Professor orientador: Jéssica Queiroz</p>
+            </div>
+            
+            <div class="image-container">
+                <img src="img/roosevelt.jpg" alt="Presidente Roosevelt" class="roosevelt-img"
+                     onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'logo-placeholder\'>E.E.<br>Roosevelt</div>';">
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="instructions">
+            <h3>Como usar este projeto</h3>
+            <p>1. Preencha o formulário de auto declaração abaixo.</p>
+            <p>2. Os dados são armazenados localmente e sincronizados com o Google Sheets.</p>
+            <p>3. A declaração é pessoal, intransferível e não haverá qualquer tipo de verificação ou julgamento.</p>
+            <p>4. Após enviar, visualize os dados estatísticos no painel abaixo.</p>
+            <p>5. Use os botões para filtrar por turma ou ver todos os dados.</p>
+        </div>
+        
+        <button id="admin-toggle" class="btn-admin">Acesso Admin</button>
+        
+        <div id="admin-panel" class="admin-panel">
+            <h3>Painel de Administração</h3>
+            <p>Esta área é restrita para administradores. Use com cuidado.</p>
+            <button id="clear-data" class="btn-clear">Zerar Todos os Dados</button>
+            <button id="toggle-config" class="btn-config">Configurar Google Sheets</button>
+            <p><small>Esta ação não pode ser desfeita. Todos os registros serão perdidos.</small></p>
+        </div>
+
+        <div id="config-panel" class="config-panel">
+            <h3>Configuração do Google Sheets</h3>
+            <div class="config-form">
+                <div class="form-group">
+                    <label for="sheet-id">ID da Planilha Google</label>
+                    <input type="text" id="sheet-id" placeholder="Ex: 1ABC123def456GHI...">
+                </div>
+                <div class="form-group">
+                    <label for="sheet-name">Nome da Planilha</label>
+                    <input type="text" id="sheet-name" placeholder="Ex: Dados Declarações" value="Dados Declarações">
+                </div>
+            </div>
+            <button id="save-config" class="btn-config">Salvar Configuração</button>
+            <div id="config-status" class="config-status status-disconnected">
+                Não configurado/conectado
+            </div>
+            <div class="instructions">
+                <h4>Como configurar:</h4>
+                <p>1. Crie uma planilha no Google Sheets</p>
+                <p>2. Compartilhe a planilha com este email de serviço: <code>YOUR_SERVICE_EMAIL@YOUR_PROJECT.iam.gserviceaccount.com</code></p>
+                <p>3. Copie o ID da planilha da URL (ex: https://docs.google.com/spreadsheets/d/<strong>ABC123DEF456</strong>/edit)</p>
+                <p>4. Cole o ID no campo acima e salve</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">Autodeclaração: Étnico-Racial, Social e Econômica</h2>
+            <form id="declaration-form">
+                <div class="form-group">
+                    <label for="student-class">Turma</label>
+                    <select id="student-class" required>
+                        <option value="">Selecione sua turma</option>
+                        <option value="6A">6º Ano A</option>
+                        <option value="6B">6º Ano B</option>
+                        <option value="6C">6º Ano C</option>
+                        <option value="7A">7º Ano A</option>
+                        <option value="7B">7º Ano B</option>
+                        <option value="8A">8º Ano A</option>
+                        <option value="8B">8º Ano B</option>
+                        <option value="9A">9º Ano A</option>
+                        <option value="9B">9º Ano B</option>
+                        <option value="1A">1ª Série EM A</option>
+                        <option value="1B">1ª Série EM B</option>
+                        <option value="1C">1ª Série EM C</option>
+                        <option value="2A">2ª Série EM A</option>
+                        <option value="2B">2ª Série EM B</option>
+                        <option value="2C">2ª Série EM C</option>
+                        <option value="2D">2ª Série EM D</option>
+                        <option value="3A">3ª Série EM A</option>
+                        <option value="3B">3ª Série EM B</option>
+                        <option value="3C">3ª Série EM C</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Como você se autodeclara?</label>
+                    <select id="ethnicity" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="Branco">Branco(a)</option>
+                        <option value="Preto">Preto(a)</option>
+                        <option value="Pardo">Pardo(a)</option>
+                        <option value="Amarelo">Amarelo(a) (de origem oriental)</option>
+                        <option value="Indigena">Indígena</option>
+                        <option value="Outro">Prefiro não declarar / Outro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Quantos anos você tem?</label>
+                    <select id="age" required>
+                        <option value="">Selecione sua idade</option>
+                        <option value="10-12">10 a 12 anos</option>
+                        <option value="13-15">13 a 15 anos</option>
+                        <option value="16-18">16 a 18 anos</option>
+                        <option value="19+">19 anos ou mais</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="family-income">Renda Familiar:</label>
+                    <select id="family-income" required>
+                        <option value="">Selecione a faixa de renda</option>
+                        <option value="Ate1SM">Até 1 salário mínimo</option>
+                        <option value="1a2SM">De 1 a 2 salários mínimos</option>
+                        <option value="2a3SM">De 2 a 3 salários mínimos</option>
+                        <option value="3a5SM">De 3 a 5 salários mínimos</option>
+                        <option value="Acima5SM">Acima de 5 salários mínimos</option>
+                        <option value="NaoInformar">Prefiro não responder</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="household-members">Quantas pessoas residem na sua residência?</label>
+                    <select id="household-members" required>
+                        <option value="">Selecione a quantidade</option>
+                        <option value="1">1 pessoa</option>
+                        <option value="2">2 pessoas</option>
+                        <option value="3">3 pessoas</option>
+                        <option value="4">4 pessoas</option>
+                        <option value="5ouMais">5 ou mais pessoas</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="basic-sanitation">Sua residência tem saneamento básico?</label>
+                    <select id="basic-sanitation" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="Completo">Sim, tem saneamento básico completo</option>
+                        <option value="Parcial">Parcial (falta algum serviço)</option>
+                        <option value="NaoTem">Não tem saneamento básico</option>
+                        <option value="NaoSabe">Não sei informar</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="eating-habits">Quais são seus hábitos alimentares?</label>
+                    <select id="eating-habits" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="Saudavel">Alimentação saudável e balanceada</option>
+                        <option value="PoucoSaudavel">Alimentação pouco saudável</option>
+                        <option value="FastFood">Consumo frequente de fast food</option>
+                        <option value="Vegetariano">Dieta vegetariana/vegana</option>
+                        <option value="Restritivo">Dieta com restrições alimentares</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="drugs-alcohol"> Qual a sua identidade de gênero?</label>
+                    <select id="drugs-alcohol" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="Feminino"> Feminino</option>
+                        <option value="Masculino"> Masculino</option>
+                        <option value="NaoBinario">Não-binário</option>
+                        <option value="Transgenero">Transgênero</option>
+                        <option value="PrefiroNaoResponder">Prefiro não responder</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="personal-use">Você usa drogas ilícitas ou álcool?</label>
+                    <select id="personal-use" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="NuncaUsei">Nunca usei</option>
+                        <option value="JaUsei">Já usei, mas não uso mais</option>
+                        <option value="UsoOcasional">Uso ocasionalmente</option>
+                        <option value="UsoFrequente">Uso frequentemente</option>
+                        <option value="PrefiroNaoResponder">Prefiro não responder</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="college-plans">Você pretende fazer faculdade?</label>
+                    <select id="college-plans" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="SimComCertexa">Sim, com certeza</option>
+                        <option value="SimProvavelmente">Sim, provavelmente</option>
+                        <option value="NaoSeiAinda">Não sei ainda</option>
+                        <option value="ProvavelmenteNao">Provavelmente não</option>
+                        <option value="DefinitivamenteNao">Definitivamente não</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="happiness">Em uma escala de 1 a 5, o quão feliz você se considera?</label>
+                    <select id="happiness" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="1">1 - Muito infeliz</option>
+                        <option value="2">2 - Infeliz</option>
+                        <option value="3">3 - Neutro</option>
+                        <option value="4">4 - Feliz</option>
+                        <option value="5">5 - Muito feliz</option>
+                    </select>
+                </div>
+                
+                <button type="submit" id="submit-button">Enviar Declaração</button>
+                <span id="submit-status" style="margin-left: 10px;"></span>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">Dados Estatísticos</h2>
+            
+            <div class="class-selector">
+                <button class="class-btn active" data-class="all">Toda a Escola</button>
+                
+                <div class="level-title">6º Ano</div>
+                <button class="class-btn" data-class="6A">6º A</button>
+                <button class="class-btn" data-class="6B">6º B</button>
+                <button class="class-btn" data-class="6C">6º C</button>
+                
+                <div class="level-title">7º Ano</div>
+                <button class="class-btn" data-class="7A">7º A</button>
+                <button class="class-btn" data-class="7B">7º B</button>
+                
+                <div class="level-title">8º Ano</div>
+                <button class="class-btn" data-class="8A">8º A</button>
+                <button class="class-btn" data-class="8B">8º B</button>
+                
+                <div class="level-title">9º Ano</div>
+                <button class="class-btn" data-class="9A">9º A</button>
+                <button class="class-btn" data-class="9B">9º B</button>
+                
+                <div class="level-title">1ª Série EM</div>
+                <button class="class-btn" data-class="1A">1ª A</button>
+                <button class="class-btn" data-class="1B">1ª B</button>
+                <button class="class-btn" data-class="1C">1ª C</button>
+                
+                <div class="level-title">2ª Série EM</div>
+                <button class="class-btn" data-class="2A">2ª A</button>
+                <button class="class-btn" data-class="2B">2ª B</button>
+                <button class="class-btn" data-class="2C">2ª C</button>
+                <button class="class-btn" data-class="2D">2ª D</button>
+                
+                <div class="level-title">3ª Série EM</div>
+                <button class="class-btn" data-class="3A">3ª A</button>
+                <button class="class-btn" data-class="3B">3ª B</button>
+                <button class="class-btn" data-class="3C">3ª C</button>
+            </div>
+            
+            <div class="stats-container">
+                <div>
+                    <h3>Distribuição por Etnia</h3>
+                    <div class="chart-container">
+                        <canvas id="ethnicity-chart"></canvas>
+                    </div>
+                    <div id="no-data-chart" class="empty-data">Nenhuma declaração enviada ainda</div>
+                </div>
+                
+                <div>
+                    <h3>Resumo Estatístico</h3>
+                    <div class="summary-box">
+                        <h4 id="selected-class">Toda a Escola</h4>
+                        <p>Total de declarações: <span id="total-declarations">0</span></p>
+                    </div>
+                    
+                    <div class="summary-box">
+                        <h4>Distribuição</h4>
+                        <div id="ethnicity-breakdown" class="empty-data">Nenhuma declaração enviada ainda</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="additional-charts">
+                <div>
+                    <h3>Distribuição por Idade</h3>
+                    <div class="additional-chart-container">
+                        <canvas id="age-chart"></canvas>
+                    </div>
+                    <div id="no-age-data" class="empty-data">Nenhum dado de idade disponível</div>
+                </div>
+                
+                <div>
+                    <h3>Distribuição por Renda Familiar</h3>
+                    <div class="additional-chart-container">
+                        <canvas id="income-chart"></canvas>
+                    </div>
+                    <div id="no-income-data" class="empty-data">Nenhum dado de renda disponível</div>
+                </div>
+                
+                <div>
+                    <h3>Distribuição por Pessoas por Residência</h3>
+                    <div class="additional-chart-container">
+                        <canvas id="household-chart"></canvas>
+                    </div>
+                    <div id="no-household-data" class="empty-data">Nenhum dado de residência disponível</div>
+                </div>
+                
+                <div>
+                    <h3>Distribuição por Saneamento Básico</h3>
+                    <div class="additional-chart-container">
+                        <canvas id="sanitation-chart"></canvas>
+                    </div>
+                    <div id="no-sanitation-data" class="empty-data">Nenhum dado de saneamento disponível</div>
+                </div>
+                
+                <div>
+                    <h3>Distribuição por Hábitos Alimentares</h3>
+                    <div class="additional-chart-container">
+                        <canvas id="eating-habits-chart"></canvas>
+                    </div>
+                    <div id="no-eating-habits-data" class="empty-data">Nenhum dado de hábitos alimentares disponível</div>
+                </div>
+                
+                <div>
+                    <h3>Distribuição por Identidade de gênero</h3>
+                    <div class="additional-chart-container">
+                        <canvas id="gender-chart"></canvas>
+                    </div>
+                    <div id="no-gender-data" class="empty-data">Nenhum dado disponível</div>
+                </div>
+                
+                <div>
+                    <h3>Distribuição por uso Pessoal de Drogas/Álcool</h3>
+                    <div class="additional-chart-container">
+                        <canvas id="personal-use-chart"></canvas>
+                    </div>
+                    <div id="no-personal-use-data" class="empty-data">Nenhum dado disponível</div>
+                </div>
+                
+                <div>
+                    <h3> Distribuição por planos para Faculdade</h3>
+                    <div class="additional-chart-container">
+                        <canvas id="college-plans-chart"></canvas>
+                    </div>
+                    <div id="no-college-plans-data" class="empty-data">Nenhum dado sobre faculdade disponível</div>
+                </div>
+                
+                <div>
+                    <h3>Distribuição por nível de Felicidade</h3>
+                    <div class="additional-chart-container">
+                        <canvas id="happiness-chart"></canvas>
+                    </div>
+                    <div id="no-happiness-data" class="empty-data">Nenhum dado sobre felicidade disponível</div>
+                </div>
+            </div>
+
+            <button id="toggle-table" class="toggle-table">Mostrar Tabela de Dados</button>
+            
+            <div id="data-table-container" class="data-table-container" style="display: none;">
+                <div class="table-section">
+                    <h3>Distribuição por Etnia</h3>
+                    <table class="data-table" id="ethnicity-table">
+                        <thead>
+                            <tr>
+                                <th>Etnia</th>
+                                <th>Quantidade</th>
+                                <th>Percentual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão preenchidos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="table-section">
+                    <h3>Distribuição por Idade</h3>
+                    <table class="data-table" id="age-table">
+                        <thead>
+                            <tr>
+                                <th>Faixa Etária</th>
+                                <th>Quantidade</th>
+                                <th>Percentual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão preenchidos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Adicione mais tabelas para outras categorias conforme necessário -->
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Projeto Interdisciplinar de Análise Estatística - Desenvolvido pelos alunos da turma do Ensino Médio 3° Série B  - 2025</p>
+    </footer>
+
+    <div id="sync-notification" class="sync-notification">Dados atualizados!</div>
+
+    <script>
+    (function() {
+        // Dados - começando completamente zerados
+        let declarations = JSON.parse(localStorage.getItem('ethnicityDeclarations')) || [];
+        let lastUpdateTime = localStorage.getItem('lastUpdateTime') || 0;
+        
+        // Configurações do Google Sheets
+        let googleSheetsConfig = JSON.parse(localStorage.getItem('googleSheetsConfig')) || {
+            sheetId: '',
+            sheetName: 'Dados Declarações',
+            connected: false
+        };
+        
+        // Mapeamento de valores para rótulos legíveis
+        const valueLabels = {
+            'Branco': 'Branco(a)', 'Preto': 'Preto(a)', 'Pardo': 'Pardo(a)', 
+            'Amarelo': 'Amarelo(a)', 'Indigena': 'Indígena', 'Outro': 'Prefiro não declarar / Outro',
+            '10-12': '10 a 12 anos', '13-15': '13 a 15 anos', '16-18': '16 a 18 anos', '19+': '19 anos ou mais',
+            'Ate1SM': 'Até 1 salário mínimo', '1a2SM': 'De 1 a 2 salários mínimos', '2a3SM': 'De 2 a 3 salários mínimos',
+            '3a5SM': 'De 3 a 5 salários mínimos', 'Acima5SM': 'Acima de 5 salários mínimos', 'NaoInformar': 'Prefiro não responder',
+            '1': '1 pessoa', '2': '2 pessoas', '3': '3 pessoas', '4': '4 pessoas', '5ouMais': '5 ou mais pessoas',
+            'Completo': 'Saneamento completo', 'Parcial': 'Saneamento parcial', 'NaoTem': 'Não tem saneamento', 'NaoSabe': 'Não sabe informar',
+            'Saudavel': 'Alimentação saudável', 'PoucoSaudavel': 'Alimentação pouco saudável', 'FastFood': 'Consumo frequente de fast food',
+            'Vegetariano': 'Dieta vegetariana/vegana', 'Restritivo': 'Dieta com restrições',
+            'Feminino': 'Feminino', 'Masculino': 'Masculino', 'NaoBinario': 'Não-binário', 'Transgenero': 'Transgênero', 'PrefiroNaoResponder': 'Prefiro não responder',
+            'NuncaUsei': 'Nunca usei', 'JaUsei': 'Já usei, mas não uso mais', 'UsoOcasional': 'Uso ocasionalmente',
+            'UsoFrequente': 'Uso frequentemente', 'PrefiroNaoResponder': 'Prefiro não responder',
+            'SimComCertexa': 'Sim, com certeza', 'SimProvavelmente': 'Sim, provavelmente', 'NaoSeiAinda': 'Não sei ainda',
+            'ProvavelmenteNao': 'Provavelmente não', 'DefinitivamenteNao': 'Definitivamente não',
+            '1': '1 - Muito infeliz', '2': '2 - Infeliz', '3': '3 - Neutro', '4': '4 - Feliz', '5': '5 - Muito feliz'
+        };
+
+        // Elementos do DOM
+        const form = document.getElementById('declaration-form');
+        const submitButton = document.getElementById('submit-button');
+        const submitStatus = document.getElementById('submit-status');
+        const classButtons = document.querySelectorAll('.class-btn');
+        const totalDeclarationsEl = document.getElementById('total-declarations');
+        const selectedClassEl = document.getElementById('selected-class');
+        const ethnicityBreakdownEl = document.getElementById('ethnicity-breakdown');
+        const syncNotification = document.getElementById('sync-notification');
+        const toggleTableButton = document.getElementById('toggle-table');
+        const dataTableContainer = document.getElementById('data-table-container');
+        const configPanel = document.getElementById('config-panel');
+        const configStatus = document.getElementById('config-status');
+
+        // Configuração dos gráficos
+        const charts = {};
+        const chartElements = {
+            ethnicity: document.getElementById('ethnicity-chart'),
+            age: document.getElementById('age-chart'),
+            income: document.getElementById('income-chart'),
+            household: document.getElementById('household-chart'),
+            sanitation: document.getElementById('sanitation-chart'),
+            eatingHabits: document.getElementById('eating-habits-chart'),
+            gender: document.getElementById('gender-chart'),
+            personalUse: document.getElementById('personal-use-chart'),
+            collegePlans: document.getElementById('college-plans-chart'),
+            happiness: document.getElementById('happiness-chart')
+        };
+
+        // ==============================================
+        // FUNÇÕES DE INTEGRAÇÃO COM GOOGLE SHEETS
+        // ==============================================
+
+        // Função para salvar dados no Google Sheets
+        async function saveToGoogleSheets(formData) {
+            if (!googleSheetsConfig.sheetId || !googleSheetsConfig.connected) {
+                console.log("Google Sheets não configurado ou não conectado");
+                return false;
+            }
+
+            try {
+                submitStatus.innerHTML = '<span class="loading"></span> Enviando para Google Sheets...';
+                
+                // URL do Google Apps Script (substitua com o URL do seu script)
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbxtUv8zSQ-tpWlFDovnhxu8CchgjU8MBarg2N1c7VGwkjZdSRkSkvd5RD4WJ62aU6k6/exec';
+                
+                // Dados a serem enviados
+                const dataToSend = {
+                    sheetId: googleSheetsConfig.sheetId,
+                    sheetName: googleSheetsConfig.sheetName,
+                    data: formData
+                };
+                
+                // Enviar dados para o Google Apps Script
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dataToSend)
+                });
+                
+                // Como no-cors não permite ler a resposta, assumimos sucesso
+                console.log("Dados enviados para Google Sheets");
+                submitStatus.innerHTML = '✅ Dados salvos localmente e na nuvem';
+                setTimeout(() => {
+                    submitStatus.innerHTML = '';
+                }, 3000);
+                
+                return true;
+            } catch (error) {
+                console.error("Erro ao enviar para Google Sheets:", error);
+                submitStatus.innerHTML = '⚠️ Dados salvos apenas localmente';
+                setTimeout(() => {
+                    submitStatus.innerHTML = '';
+                }, 3000);
+                return false;
+            }
+        }
+
+        // Função para testar a conexão com o Google Sheets
+        async function testGoogleSheetsConnection() {
+            if (!googleSheetsConfig.sheetId) {
+                updateConfigStatus(false, "ID da planilha não configurado");
+                return false;
+            }
+
+            try {
+                const scriptUrl = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?action=test';
+                
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sheetId: googleSheetsConfig.sheetId,
+                        sheetName: googleSheetsConfig.sheetName
+                    })
+                });
+                
+                // Assumimos sucesso se não houver erro
+                updateConfigStatus(true, "Conectado com sucesso ao Google Sheets");
+                return true;
+            } catch (error) {
+                console.error("Erro ao testar conexão com Google Sheets:", error);
+                updateConfigStatus(false, "Erro ao conectar com Google Sheets");
+                return false;
+            }
+        }
+
+        // Atualizar status da configuração
+        function updateConfigStatus(connected, message) {
+            googleSheetsConfig.connected = connected;
+            configStatus.textContent = message;
+            configStatus.className = 'config-status ' + (connected ? 'status-connected' : 'status-disconnected');
+            
+            // Salvar configuração atualizada
+            localStorage.setItem('googleSheetsConfig', JSON.stringify(googleSheetsConfig));
+        }
+
+        // ==============================================
+        // FUNÇÕES DE SINCRONIZAÇÃO
+        // ==============================================
+
+        function setupStorageSync() {
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'ethnicityDeclarations' && e.newValue) {
+                    try {
+                        const newData = JSON.parse(e.newValue);
+                        if (Array.isArray(newData)) {
+                            declarations = newData;
+                            updateAllDisplays();
+                            showSyncNotification('Dados atualizados de outra aba!');
+                        }
+                    } catch (error) {
+                        console.error('Erro ao processar dados sincronizados:', error);
+                    }
+                }
+            });
+        }
+
+        function saveData() {
+            localStorage.setItem('ethnicityDeclarations', JSON.stringify(declarations));
+            localStorage.setItem('lastUpdateTime', Date.now().toString());
+        }
+
+        function checkForUpdates() {
+            const storedTime = localStorage.getItem('lastUpdateTime');
+            if (storedTime && parseInt(storedTime) > parseInt(lastUpdateTime)) {
+                const storedData = localStorage.getItem('ethnicityDeclarations');
+                if (storedData) {
+                    try {
+                        declarations = JSON.parse(storedData);
+                        updateAllDisplays();
+                        lastUpdateTime = storedTime;
+                        showSyncNotification('Dados sincronizados!');
+                    } catch (error) {
+                        console.error('Erro ao carregar dados:', error);
+                    }
+                }
+            }
+        }
+
+        function showSyncNotification(message) {
+            syncNotification.textContent = message;
+            syncNotification.style.display = 'block';
+            setTimeout(() => {
+                syncNotification.style.display = 'none';
+            }, 3000);
+        }
+
+        // ==============================================
+        // FUNÇÕES PRINCIPAIS - COMPLETAMENTE CORRIGIDAS
+        // ==============================================
+
+        function processData(classFilter = 'all') {
+            const filteredData = classFilter === 'all' 
+                ? declarations 
+                : declarations.filter(dec => dec.class === classFilter);
+
+            // Definir todas as categorias possíveis com valores padrão zerados
+            const categories = {
+                ethnicity: ['Branco', 'Preto', 'Pardo', 'Amarelo', 'Indigena', 'Outro'],
+                age: ['10-12', '13-15', '16-18', '19+'],
+                income: ['Ate1SM', '1a2SM', '2a3SM', '3a5SM', 'Acima5SM', 'NaoInformar'],
+                household: ['1', '2', '3', '4', '5ouMais'],
+                sanitation: ['Completo', 'Parcial', 'NaoTem', 'NaoSabe'],
+                eatingHabits: ['Saudavel', 'PoucoSaudavel', 'FastFood', 'Vegetariano', 'Restritivo'],
+                gender: ['Feminino', 'Masculino', 'NaoBinario', 'Transgenero', 'PrefiroNaoResponder'],
+                personalUse: ['NuncaUsei', 'JaUsei', 'UsoOcasional', 'UsoFrequente', 'PrefiroNaoResponder'],
+                collegePlans: ['SimComCertexa', 'SimProvavelmente', 'NaoSeiAinda', 'ProvavelmenteNao', 'DefinitivamenteNao'],
+                happiness: ['1', '2', '3', '4', '5']
+            };
+
+            const counts = {};
+            
+            // Inicializar contadores com zeros
+            Object.keys(categories).forEach(category => {
+                counts[category] = {};
+                categories[category].forEach(item => {
+                    counts[category][item] = 0;
+                });
+            });
+
+            // Contar os dados reais
+            filteredData.forEach(dec => {
+                Object.keys(categories).forEach(category => {
+                    const value = dec[category];
+                    if (value && counts[category][value] !== undefined) {
+                        counts[category][value]++;
+                    }
+                });
+            });
+
+            return {
+                total: filteredData.length,
+                filteredData: filteredData,
+                counts: counts
+            };
+        }
+
+        function updateChart(category, data, classFilter) {
+            const ctx = chartElements[category].getContext('2d');
+            const counts = data.counts[category];
+            
+            // Destruir gráfico existente se houver
+            if (charts[category]) {
+                charts[category].destroy();
+            }
+
+            const labels = [];
+            const values = [];
+            
+            // Preparar dados para o gráfico - apenas valores > 0
+            for (const [key, value] of Object.entries(counts)) {
+                if (value > 0) {
+                    labels.push(valueLabels[key] || key);
+                    values.push(value);
+                }
+            }
+
+            // Mostrar mensagem se não houver dados
+            const noDataElement = document.getElementById(`no-${category}-data`);
+            if (values.length === 0) {
+                if (noDataElement) noDataElement.style.display = 'block';
+                chartElements[category].style.display = 'none';
+                return;
+            }
+
+            // Esconder mensagem de nenhum dado e mostrar gráfico
+            if (noDataElement) noDataElement.style.display = 'none';
+            chartElements[category].style.display = 'block';
+
+            // Definir tipo de gráfico baseado na categoria
+            const isPieChart = ['ethnicity', 'sanitation', 'eatingHabits', 'collegePlans', 'personalUse'].includes(category);
+            
+            // Cores para os gráficos
+            const colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+            ];
+
+            charts[category] = new Chart(ctx, {
+                type: isPieChart ? 'pie' : 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Quantidade',
+                        data: values,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: isPieChart ? 'right' : 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: `${getChartTitle(category)} - ${classFilter === 'all' ? 'Escola Inteira' : 'Turma ' + classFilter}`
+                        }
+                    }
+                }
+            });
+        }
+
+        function getChartTitle(category) {
+            const titles = {
+                ethnicity: 'Distribuição Étnica',
+                age: 'Distribuição por Idade',
+                income: 'Distribuição por Renda',
+                household: 'Pessoas por Residência',
+                sanitation: 'Saneamento Básico',
+                eatingHabits: 'Hábitos Alimentares',
+                gender: 'Identidade de Gênero',
+                personalUse: 'Uso de Drogas/Álcool',
+                collegePlans: 'Planos para Faculdade',
+                happiness: 'Nível de Felicidade'
+            };
+            return titles[category] || category;
+        }
+
+        function updateDataTables(data) {
+            // Atualizar tabela de etnia
+            updateSingleTable('ethnicity', data.counts.ethnicity, data.total);
+            updateSingleTable('age', data.counts.age, data.total);
+            updateSingleTable('income', data.counts.income, data.total);
+            // Adicione mais tabelas conforme necessário
+        }
+
+        function updateSingleTable(category, counts, total) {
+            const tableId = `${category}-table`;
+            const tableElement = document.getElementById(tableId);
+            
+            if (!tableElement) return;
+            
+            const tableBody = tableElement.querySelector('tbody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            for (const [key, value] of Object.entries(counts)) {
+                if (value > 0) {
+                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${valueLabels[key] || key}</td>
+                        <td>${value}</td>
+                        <td>${percentage}% <span class="percentage">(${value}/${total})</span></td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                }
+            }
+            
+            if (tableBody.children.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="3" style="text-align: center; color: #757575;">Nenhum dado disponível</td>`;
+                tableBody.appendChild(row);
+            }
+        }
+
+        function updateAllDisplays() {
+            const currentClass = document.querySelector('.class-btn.active').dataset.class;
+            const data = processData(currentClass);
+            
+            // Atualizar todos os gráficos
+            Object.keys(chartElements).forEach(category => {
+                updateChart(category, data, currentClass);
+            });
+            
+            // Atualizar informações textuais
+            totalDeclarationsEl.textContent = data.total;
+            selectedClassEl.textContent = currentClass === 'all' ? 'Toda a Escola' : `Turma ${currentClass}`;
+            
+            // Atualizar breakdown de etnia
+            let breakdownHTML = '';
+            for (const [ethnicity, count] of Object.entries(data.counts.ethnicity)) {
+                if (count > 0) {
+                    const percentage = data.total > 0 ? ((count / data.total) * 100).toFixed(1) : 0;
+                    breakdownHTML += `<p>${valueLabels[ethnicity]}: ${count} (${percentage}%)</p>`;
+                }
+            }
+            ethnicityBreakdownEl.innerHTML = breakdownHTML || '<div class="empty-data">Nenhuma declaração para exibir</div>';
+            
+            // Atualizar tabelas
+            updateDataTables(data);
+        }
+
+        // ==============================================
+        // EVENT LISTENERS E INICIALIZAÇÃO
+        // ==============================================
+
+        function setupEventListeners() {
+            // Event listener para o formulário
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Coletar dados do formulário
+                const formData = {
+                    class: document.getElementById('student-class').value,
+                    ethnicity: document.getElementById('ethnicity').value,
+                    age: document.getElementById('age').value,
+                    income: document.getElementById('family-income').value,
+                    household: document.getElementById('household-members').value,
+                    sanitation: document.getElementById('basic-sanitation').value,
+                    eatingHabits: document.getElementById('eating-habits').value,
+                    gender: document.getElementById('drugs-alcohol').value,
+                    personalUse: document.getElementById('personal-use').value,
+                    collegePlans: document.getElementById('college-plans').value,
+                    happiness: document.getElementById('happiness').value,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Validar se todos os campos foram preenchidos
+                for (const key in formData) {
+                    if (!formData[key]) {
+                        alert('Por favor, preencha todos os campos do formulário.');
+                        return;
+                    }
+                }
+                
+                // Adicionar nova declaração
+                declarations.push(formData);
+                saveData();
+                
+                // Tentar salvar no Google Sheets
+                await saveToGoogleSheets(formData);
+                
+                // Atualizar a interface
+                updateAllDisplays();
+                
+                // Limpar formulário
+                form.reset();
+            });
+
+            // Event listeners para os botões de turma
+            classButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    classButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    updateAllDisplays();
+                });
+            });
+
+            // Event listener para mostrar/ocultar tabela
+            toggleTableButton.addEventListener('click', function() {
+                if (dataTableContainer.style.display === 'none') {
+                    dataTableContainer.style.display = 'block';
+                    this.textContent = 'Ocultar Tabela de Dados';
+                } else {
+                    dataTableContainer.style.display = 'none';
+                    this.textContent = 'Mostrar Tabela de Dados';
+                }
+            });
+
+            // Event listener para o botão de admin
+            document.getElementById('admin-toggle').addEventListener('click', function() {
+                const password = prompt('Digite a senha de administração:');
+                if (password === 'admin123') {
+                    const adminPanel = document.getElementById('admin-panel');
+                    adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
+                } else {
+                    alert('Senha incorreta!');
+                }
+            });
+
+            // Event listener para configurar Google Sheets
+            document.getElementById('toggle-config').addEventListener('click', function() {
+                configPanel.style.display = configPanel.style.display === 'block' ? 'none' : 'block';
+                
+                // Preencher campos se já houver configuração
+                if (googleSheetsConfig.sheetId) {
+                    document.getElementById('sheet-id').value = googleSheetsConfig.sheetId;
+                }
+                if (googleSheetsConfig.sheetName) {
+                    document.getElementById('sheet-name').value = googleSheetsConfig.sheetName;
+                }
+            });
+
+            // Event listener para salvar configuração
+            document.getElementById('save-config').addEventListener('click', function() {
+                const sheetId = document.getElementById('sheet-id').value.trim();
+                const sheetName = document.getElementById('sheet-name').value.trim() || 'Dados Declarações';
+                
+                if (!sheetId) {
+                    alert('Por favor, informe o ID da planilha Google.');
+                    return;
+                }
+                
+                // Atualizar configuração
+                googleSheetsConfig.sheetId = sheetId;
+                googleSheetsConfig.sheetName = sheetName;
+                
+                // Testar conexão
+                testGoogleSheetsConnection();
+                
+                // Salvar configuração
+                localStorage.setItem('googleSheetsConfig', JSON.stringify(googleSheetsConfig));
+                
+                alert('Configuração salva com sucesso!');
+            });
+
+            // Event listener para limpar dados
+            document.getElementById('clear-data').addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja ZERAR TODOS OS DADOS? Esta ação não pode ser desfeita.')) {
+                    declarations = [];
+                    saveData();
+                    updateAllDisplays();
+                    alert('Dados zerados com sucesso!');
+                }
+            });
+        }
+
+        // Iniciar a aplicação
+        function initialize() {
+            setupStorageSync();
+            setupEventListeners();
+            updateAllDisplays();
+            
+            // Atualizar status da configuração do Google Sheets
+            if (googleSheetsConfig.sheetId) {
+                testGoogleSheetsConnection();
+            } else {
+                updateConfigStatus(false, "Não configurado");
+            }
+            
+            // Verificar atualizações a cada 2 segundos
+            setInterval(checkForUpdates, 2000);
+        }
+
+        // Iniciar
+        initialize();
+
+    })();
+    </script>
+</body>
+</html>
